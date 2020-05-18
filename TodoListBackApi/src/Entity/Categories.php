@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Categories
@@ -25,6 +26,7 @@ class Categories
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=64, nullable=false, options={"comment"="Le nom de la catégorie"})
+     * @Groups("category")
      */
     private $name;
 
@@ -32,6 +34,7 @@ class Categories
      * @var bool
      *
      * @ORM\Column(name="status", type="boolean", nullable=false, options={"comment"="Le statut de la catégorie (1=active, 2=désactivée)"})
+     * @Groups("category")
      */
     private $status = '0';
 

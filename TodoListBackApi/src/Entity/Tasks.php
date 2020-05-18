@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Tasks
@@ -25,6 +26,7 @@ class Tasks
      * @var string
      *
      * @ORM\Column(name="title", type="string", length=128, nullable=false, options={"comment"="Le titre de la tâche"})
+     * @Groups("task")
      */
     private $title;
 
@@ -32,6 +34,7 @@ class Tasks
      * @var bool
      *
      * @ORM\Column(name="completion", type="boolean", nullable=false, options={"comment"="Le pourcentage de completion de la tâche"})
+     * @Groups("task")
      */
     private $completion = '0';
 
@@ -39,6 +42,7 @@ class Tasks
      * @var bool
      *
      * @ORM\Column(name="status", type="boolean", nullable=false, options={"comment"="Le statut de la tâche (1=active, 2=archivée)"})
+     * @Groups("task")
      */
     private $status = '0';
 
