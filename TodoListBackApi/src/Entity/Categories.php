@@ -19,6 +19,7 @@ class Categories
      * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned"=true,"comment"="L'identifiant de notre catégorie"})
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @Groups("task")
      */
     private $id;
 
@@ -27,6 +28,7 @@ class Categories
      *
      * @ORM\Column(name="name", type="string", length=64, nullable=false, options={"comment"="Le nom de la catégorie"})
      * @Groups("category")
+     * @Groups("task")
      */
     private $name;
 

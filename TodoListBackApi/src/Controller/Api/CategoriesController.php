@@ -12,9 +12,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class CategoriesController extends AbstractController
 {
     /**
-     * @Route("/", name="categories")
+     * @Route("/", name="categories",)
      */
-    public function index(CategoriesRepository $categoriesRepository, SerializerInterface $serializer)
+    public function loadCategoryList(CategoriesRepository $categoriesRepository, SerializerInterface $serializer)
     {
         $categories = $serializer->normalize($categoriesRepository->findAll(), null, ['groups' => 'category']);
 

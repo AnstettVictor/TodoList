@@ -67,6 +67,7 @@ class Tasks
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="category_id", referencedColumnName="id")
      * })
+     * @Groups("task")
      */
     private $category;
 
