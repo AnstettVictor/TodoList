@@ -13,6 +13,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class Tasks
 {
+    
+    public const STATUS_TODO     = 1;
+    public const STATUS_DONE     = 2;
+    public const STATUS_ARCHIVED = 3;
+
     /**
      * @var int
      *
@@ -51,7 +56,7 @@ class Tasks
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP","comment"="La date de création de la tâche"})
      */
-    private $createdAt = 'CURRENT_TIMESTAMP';
+    private $createdAt;
 
     /**
      * @var \DateTime|null
@@ -70,6 +75,10 @@ class Tasks
      * @Groups("task")
      */
     private $category;
+
+
+
+    
 
     public function getId(): ?int
     {

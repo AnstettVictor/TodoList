@@ -3,7 +3,9 @@
 namespace App\Controller\Api;
 
 use App\Entity\Tasks;
+use App\Entity\Categories;
 use App\Repository\TasksRepository;
+use App\Repository\CategoriesRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -38,27 +40,27 @@ class TasksController extends AbstractController
      */
     public function addTask(Request $request)
     {
-        // On instancie un nouvel article
-        $tasks = new Tasks();
 
-     
-        
-        // On décode les données envoyées
-        $donnees = json_decode($request->getContent());
-    
-       
-        // On hydrate l'objet
-        $tasks->setTitle($donnees->title);
-        $tasks->setCompletion($donnees->completion);
-        $tasks->setStatus($donnees->status);
-        $tasks->setCategory($donnees->category);
-        
-        // On sauvegarde en base
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($tasks);
-        $entityManager->flush();
 
-        // On retourne la confirmation
-        return new Response('ok', 201);
-        }
+        // Je récupère les données envoyées au format JSON dans la requête HTTP dans des variables
+        $completion = 0;
+
+        $task = new Tasks;
+ 
+
+         // On décode les données envoyées
+         $donnees = json_decode($request->getContent());
+        // Je complète les valeurs des propriétés du model (correspondants aux colonne de la table ciblée par le model).
+        $task->setTitle($donnees->title);
+        $task->setCompletion(0);
+        $task->setStatus(Tasks::STATUS_TODO);
+        $task->setCategory(1);
+        
+        
+
+        $em = $this->getDoctrine()->getManager();
+            $em->persist($task);
+            $em->flush();
+            return new JsonResponse('ok', 200);
+    }
 }

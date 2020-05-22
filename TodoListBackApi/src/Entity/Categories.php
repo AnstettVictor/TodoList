@@ -19,6 +19,7 @@ class Categories
      * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned"=true,"comment"="L'identifiant de notre catégorie"})
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @Groups("category")
      * @Groups("task")
      */
     private $id;
@@ -45,7 +46,7 @@ class Categories
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP","comment"="La date de création de la catégorie"})
      */
-    private $createdAt = 'CURRENT_TIMESTAMP';
+    private $createdAt; 
 
     /**
      * @var \DateTime|null
