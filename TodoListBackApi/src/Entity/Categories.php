@@ -2,58 +2,57 @@
 
 namespace App\Entity;
 
+use App\Repository\CategoriesRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * Categories
- *
- * @ORM\Table(name="categories")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass=CategoriesRepository::class)
  */
 class Categories
 {
     /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned"=true,"comment"="L'identifiant de notre catégorie"})
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
      * @Groups("category")
-     * @Groups("task")
+     * @Groups("tasks")
      */
     private $id;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=64, nullable=false, options={"comment"="Le nom de la catégorie"})
+     * @ORM\Column(type="string", length=255)
      * @Groups("category")
-     * @Groups("task")
      */
     private $name;
 
     /**
-     * @var bool
-     *
-     * @ORM\Column(name="status", type="boolean", nullable=false, options={"comment"="Le statut de la catégorie (1=active, 2=désactivée)"})
-     * @Groups("category")
+     * @ORM\Column(type="boolean")
      */
-    private $status = '0';
+    private $status;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP","comment"="La date de création de la catégorie"})
+     * @ORM\Column(type="datetime")
      */
-    private $createdAt; 
+    private $createdAt;
 
     /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=true, options={"comment"="La date de la dernière mise à jour de la catégorie"})
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $updatedAt;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Tasks::class, mappedBy="category")
+     */
+    private $tasks;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+        $this->tasks = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -108,5 +107,35 @@ class Categories
         return $this;
     }
 
+    /**
+     * @return Collection|Tasks[]
+     */
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Tasks $task): self
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks[] = $task;
+            $task->setCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTask(Tasks $task): self
+    {
+        if ($this->tasks->contains($task)) {
+            $this->tasks->removeElement($task);
+            // set the owning side to null (unless already changed)
+            if ($task->getCategory() === $this) {
+                $task->setCategory(null);
+            }
+        }
+
+        return $this;
+    }
 
 }

@@ -3,64 +3,124 @@
 namespace App\Controller\Api;
 
 use App\Entity\Tasks;
-use App\Entity\Categories;
+use App\Form\TaskType;
 use App\Repository\TasksRepository;
-use App\Repository\CategoriesRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-    /**
+
+/**
      * @Route("/api/tasks", name="api_tasks_")
      */
 class TasksController extends AbstractController
-{
-
+{   
     /**
-    * @Route("/", name="browse", methods={"GET"})
+    * @Route("/", name="browse", methods={"GET"} )
     */
-    public function loadTaskList(TasksRepository $tasksRepository, SerializerInterface $serializer)
+    public function index(TasksRepository $tasksRepository, SerializerInterface $serializer)
     {
-        
-
-        $tasksList = $serializer->normalize($tasksRepository->findAll(), null, ['groups' => 'task']);
-
+        $tasks = $serializer->normalize($tasksRepository->findAll(), null, ['groups' => 'tasks']);
         return $this->json([
-            'tasksList' => $tasksList,
+            'tasks' => $tasks,
         ]);
     }
 
+    /**
+    * @Route("/{id}", name="edit", requirements={"id":"\d+"}, methods={"PUT"})
+    */
+    public function edit(int $id, Request $request, TasksRepository $tasksRepository, SerializerInterface $serializer)
+    {
+        $data = json_decode($request->getContent(), true);
+        // on récupere la tasks souhaité
+        $task = $tasksRepository->find($id);
 
+        $title = $data["title"];
+        $completion = $data["completion"];
+        $status = $data["status"];
 
+        // on déclenche une erreur si elle n'existe pas 
+        if (!$task) {
+            throw $this->createNotFoundException('The task does not exist');
+        }
 
+        $form = $this->createForm(TaskType::class, $task);
+        $form->submit($data);
+    
+        if($form->isSubmitted() && $form->isValid()) {
+
+            $task->setTitle($title);
+            $task->setCompletion($completion);
+            $task->setStatus($status);
+            $task->setUpdatedAt(new \DateTime());
+
+            $this->getDoctrine()->getManager()->flush();
+
+        }
+        
+        $newTask = $serializer->normalize($task, null, ['groups' => 'tasks']);
+        
+
+        return $this->json([
+         
+        ]);
+ 
+    }
 
     /**
-     * @Route("/", name="add", methods={"POST"})
-     */
-    public function addTask(Request $request)
+    * @Route("/", name="add", methods={"POST"} )
+    */
+    public function add(Request $request,  SerializerInterface $serializer)
     {
+        $data = json_decode($request->getContent(), true);
 
+        $task = new Tasks();
 
-        // Je récupère les données envoyées au format JSON dans la requête HTTP dans des variables
-        $completion = 0;
+        $form = $this->createForm(TaskType::class, $task);
+        $form->submit($data);
 
-        $task = new Tasks;
- 
+        if ($form->isSubmitted() && $form->isValid()) {
 
-         // On décode les données envoyées
-         $donnees = json_decode($request->getContent());
-        // Je complète les valeurs des propriétés du model (correspondants aux colonne de la table ciblée par le model).
-        $task->setTitle($donnees->title);
-        $task->setCompletion(0);
-        $task->setStatus(Tasks::STATUS_TODO);
-        $task->setCategory(1);
-        
-        
+            $em = $this->getDoctrine()->getManager();
 
-        $em = $this->getDoctrine()->getManager();
             $em->persist($task);
             $em->flush();
-            return new JsonResponse('ok', 200);
+
+        }
+
+        $newTask = $serializer->normalize($task, null, ['groups' => 'tasks']);
+
+        return $this->json(
+            [ 'task' => $newTask,],
+            $status = 201,
+            $headers = ['content-type' => 'application/Json'],
+            $context = []
+        );
+    }
+    
+    /**
+    * @Route("/{id}", name="delete", requirements={"id":"\d+"}, methods={"DELETE"} )
+    */
+    public function delete(int $id, Request $request, TasksRepository $tasksRepository)
+    {
+        $task = $tasksRepository->find($id);
+
+        if (!$task) {
+            throw $this->createNotFoundException('The task does not exist');
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $em->remove($task);
+        $em->flush();
+
+        return $this->json(
+            ['message' => 'Task deleted'],
+            $status = 200,
+            $headers = ['content-type' => 'application/Json'],
+            $context = []
+        );
+
     }
 }
